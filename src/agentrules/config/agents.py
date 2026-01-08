@@ -56,6 +56,8 @@ from agentrules.core.types.models import (
     OPENROUTER_DEEPSEEK_R1,
     OPENROUTER_LLAMA_3_70B,
     OPENROUTER_LLAMA_3_405B,
+    OPENROUTER_KIMI_K2,
+    OPENROUTER_KIMI_K2_THINKING,
     ZAI_GLM4,
     ZAI_GLM4_PLUS,
     ZAI_GLM4_AIR,
@@ -427,6 +429,18 @@ MODEL_PRESETS: dict[str, PresetDefinition] = {
         config=OPENROUTER_LLAMA_3_405B,
         label="Llama 3.1 405B (OpenRouter)",
         description="Meta's Llama 3.1 405B Instruct via OpenRouter.",
+        provider=ModelProvider.OPENROUTER,
+    ),
+    "openrouter-kimi-k2": _preset(
+        config=OPENROUTER_KIMI_K2,
+        label="Moonshot Kimi k2 (OpenRouter)",
+        description="Moonshot AI's Kimi k2 model via OpenRouter.",
+        provider=ModelProvider.OPENROUTER,
+    ),
+    "openrouter-kimi-k2-thinking": _preset(
+        config=OPENROUTER_KIMI_K2_THINKING,
+        label="Moonshot Kimi k2 Thinking (OpenRouter)",
+        description="Moonshot AI's Kimi k2 model with thinking enabled via OpenRouter.",
         provider=ModelProvider.OPENROUTER,
     ),
     "zai-glm4": _preset(

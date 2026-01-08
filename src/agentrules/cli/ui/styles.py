@@ -28,6 +28,11 @@ CLI_STYLE = Style(
         ("status.model", "fg:#00d1b2 bold"),
         ("status.provider", "fg:#888888"),
         ("status.variant", "fg:#00d1b2"),
+        # Autocomplete menu styles
+        ("completion-menu.completion", "bg:#222222 fg:#dddddd"),
+        ("completion-menu.completion.current", "bg:#00d1b2 fg:#000000 bold"),
+        ("completion-menu.meta.completion", "bg:#333333 fg:#888888"),
+        ("completion-menu.meta.completion.current", "bg:#00d1b2 fg:#000000 bold"),
     ]
 )
 

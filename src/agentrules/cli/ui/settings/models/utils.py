@@ -195,20 +195,33 @@ def select_variant(group_selection: GroupSelection) -> str | None:
     ).ask()
 
 
-def run_fuzzy_search(
+def fuzzy_select_model(
     presets: Sequence[model_presets.PresetInfo],
     current_key: str | None = None,
+    default_key: str | None = None,
+    include_reset: bool = False,
 ) -> str | None:
-    """Run a fuzzy search prompt for model presets."""
+    """Select a model preset using a searchable list."""
     
-    # Create display mapping
     display_map: dict[str, str] = {}
     choices: list[str] = []
     
+    # Add Reset option if requested
+    if include_reset and default_key:
+        default_info = model_presets.get_preset_info(default_key)
+        reset_label = "↺ Reset to default"
+        if default_info:
+            reset_label += f" ({default_info.label})"
+        display_map[reset_label] = "__RESET__"
+        choices.append(reset_label)
+
     for preset in presets:
         display = f"{preset.label} [{preset.provider_display}]"
         if preset.key == current_key:
             display += " [current]"
+        elif preset.key == default_key:
+            display += " [default]"
+            
         display_map[display] = preset.key
         choices.append(display)
 
@@ -216,7 +229,6 @@ def run_fuzzy_search(
         if not text:
             return choices
         text_lower = text.lower()
-        # Subsequence match
         matches = []
         for choice in choices:
             choice_lower = choice.lower()
@@ -226,11 +238,11 @@ def run_fuzzy_search(
         return matches
 
     selection = questionary.autocomplete(
-        "Search model (type to filter):",
+        "Select model (type to filter):",
         choices=fuzzy_matcher,
-        qmark="🔍",
+        qmark="🧠",
         style=CLI_STYLE,
-        validate=lambda x: x in display_map or "Please select a valid model from the list.",
+        validate=lambda x: x in display_map or "Please select a valid model.",
     ).ask()
     
     if selection is None:

@@ -419,6 +419,20 @@ OPENROUTER_LLAMA_3_405B = ModelConfig(
     tools_config={"enabled": False, "tools": None}
 )
 
+OPENROUTER_KIMI_K2 = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="moonshotai/kimi-k2",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_KIMI_K2_THINKING = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="moonshotai/kimi-k2-thinking",
+    reasoning=ReasoningMode.ENABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
 # ZAI (Zhipu AI) configuration
 ZAI_GLM4_PLUS = ModelConfig(
     provider=ModelProvider.ZAI,

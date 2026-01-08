@@ -9,12 +9,7 @@ from agentrules.cli.services import configuration
 from agentrules.cli.ui.styles import CLI_STYLE, navigation_choice
 from agentrules.core.configuration import model_presets
 
-from .utils import (
-    build_model_choice_state,
-    current_labels,
-    run_fuzzy_search,
-    select_variant,
-)
+from .utils import current_labels, fuzzy_select_model
 
 
 def configure_researcher_phase(
@@ -71,73 +66,29 @@ def configure_researcher_phase(
         console.print("[dim]Researcher agent already disabled.[/]")
         return False
 
-    default_info = model_presets.get_preset_info(default_key) if default_key else None
-    current_label, _ = current_labels(current_key)
-
-    keep_title = "Keep current preset"
-    if current_label and current_label != "Not configured":
-        keep_title = f"Keep current preset ({current_label})"
-
-    initial_choices = [questionary.Choice(title=keep_title, value="__KEEP__")]
-    reset_title = "Reset to default"
-    if default_info:
-        reset_title = f"Reset to default ({default_info.label} – {default_info.provider_display})"
-    initial_choices.append(questionary.Choice(title=reset_title, value="__RESET__"))
-
-    state = build_model_choice_state(
+    selection = fuzzy_select_model(
         presets,
         current_key,
         default_key,
-        include_reset=False,
-        reset_title="",
-        initial_choices=initial_choices,
+        include_reset=True,
     )
-    
-    # Prepend Search option (after Keep but before Reset if handled by initial_choices logic, wait)
-    # initial_choices puts Keep/Reset first. Search should probably be prominent.
-    # Let's put it at the very top, before "Keep current" even.
-    state.choices.insert(0, questionary.Choice(title="🔍 Search...", value="__SEARCH__"))
-
-    selection = questionary.select(
-        "Researcher preset:",
-        choices=state.choices,
-        default="__KEEP__",
-        qmark="🧠",
-        style=CLI_STYLE,
-    ).ask()
 
     if selection is None:
         console.print("[yellow]Researcher configuration cancelled.[/]")
         return False
-        
-    if selection == "__SEARCH__":
-        selection = run_fuzzy_search(presets, current_key)
-        if selection is None:
-            console.print("[yellow]Researcher configuration cancelled.[/]")
-            return False
 
-    if selection in state.group_selection_map:
-        group_selection = state.group_selection_map[selection]
-        variant_choice = select_variant(group_selection)
-        if variant_choice is None:
-            console.print("[yellow]Researcher configuration cancelled.[/]")
-            return False
-        selection = variant_choice
-
-    if selection == "__KEEP__":
-        if mode_changed:
-            configuration.save_researcher_mode(desired_mode)
-            _render_mode_message(console.print, desired_mode)
-            return True
-        console.print("[dim]No changes made to researcher settings.[/]")
-        return False
-
-    preset_changed = False
     if selection == "__RESET__":
+        # If user explicitly picks "Reset", we clear the override.
+        # But we also need to handle the case where they just wanted to toggle mode and kept the default.
+        # Actually, fuzzy_select_model handles selection.
+        # If selection is Reset, we reset.
         configuration.save_phase_model("researcher", None)
         console.print("[green]Researcher preset reset to default.[/]")
-        preset_changed = True
     else:
+        # Check if they picked "Keep current" equivalent?
+        # fuzzy_select_model doesn't have "Keep current". It has the list.
+        # If they pick the one marked [current], it's effectively keeping it.
+        # We just save it.
         configuration.save_phase_model("researcher", selection)
         preset_info = model_presets.get_preset_info(selection)
         if preset_info:
@@ -146,13 +97,12 @@ def configure_researcher_phase(
             )
         else:
             console.print("[green]Researcher preset updated.[/]")
-        preset_changed = True
 
     if mode_changed:
         configuration.save_researcher_mode(desired_mode)
         _render_mode_message(console.print, desired_mode)
 
-    return preset_changed or mode_changed
+    return True
 
 
 def _render_mode_message(printer, mode: str) -> None:
