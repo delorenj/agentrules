@@ -49,7 +49,20 @@ from agentrules.core.types.models import (
     O4_MINI_HIGH,
     O4_MINI_LOW,
     OPENROUTER_AUTO,
+    OPENROUTER_CLAUDE_3_5_SONNET,
+    OPENROUTER_CLAUDE_3_5_HAIKU,
+    OPENROUTER_GEMINI_PRO_1_5,
+    OPENROUTER_GEMINI_FLASH_1_5,
+    OPENROUTER_DEEPSEEK_R1,
+    OPENROUTER_LLAMA_3_70B,
+    OPENROUTER_LLAMA_3_405B,
     ZAI_GLM4,
+    ZAI_GLM4_PLUS,
+    ZAI_GLM4_AIR,
+    ZAI_GLM4_AIRX,
+    ZAI_GLM4_FLASH,
+    ZAI_GLM4_LONG,
+    ZAI_GLM4_0520,
     O4_MINI_MEDIUM,
     ModelConfig,
 )
@@ -105,8 +118,16 @@ def _apply_model_limits(config: ModelConfig) -> ModelConfig:
         limit = limit or 128_000
         estimator_family = estimator_family or "tiktoken"
     elif provider == ModelProvider.ZAI:
-        limit = limit or 128_000
         estimator_family = estimator_family or "tiktoken"
+        if limit is None:
+            if "glm-4-long" in name:
+                limit = 1_000_000
+            elif "glm-4-flash" in name:
+                limit = 128_000
+            elif "glm-4-air" in name:
+                limit = 128_000
+            else:
+                limit = 128_000
     elif provider == ModelProvider.XAI:
         limit = limit or 256_000
         estimator_family = estimator_family or "tiktoken"
@@ -366,10 +387,88 @@ MODEL_PRESETS: dict[str, PresetDefinition] = {
         description="OpenRouter automatic model selection.",
         provider=ModelProvider.OPENROUTER,
     ),
+    "openrouter-claude-3.5-sonnet": _preset(
+        config=OPENROUTER_CLAUDE_3_5_SONNET,
+        label="Claude 3.5 Sonnet (OpenRouter)",
+        description="Anthropic's Claude 3.5 Sonnet via OpenRouter.",
+        provider=ModelProvider.OPENROUTER,
+    ),
+    "openrouter-claude-3.5-haiku": _preset(
+        config=OPENROUTER_CLAUDE_3_5_HAIKU,
+        label="Claude 3.5 Haiku (OpenRouter)",
+        description="Anthropic's fast Claude 3.5 Haiku via OpenRouter.",
+        provider=ModelProvider.OPENROUTER,
+    ),
+    "openrouter-gemini-pro-1.5": _preset(
+        config=OPENROUTER_GEMINI_PRO_1_5,
+        label="Gemini Pro 1.5 (OpenRouter)",
+        description="Google's Gemini Pro 1.5 via OpenRouter.",
+        provider=ModelProvider.OPENROUTER,
+    ),
+    "openrouter-gemini-flash-1.5": _preset(
+        config=OPENROUTER_GEMINI_FLASH_1_5,
+        label="Gemini Flash 1.5 (OpenRouter)",
+        description="Google's fast Gemini Flash 1.5 via OpenRouter.",
+        provider=ModelProvider.OPENROUTER,
+    ),
+    "openrouter-deepseek-r1": _preset(
+        config=OPENROUTER_DEEPSEEK_R1,
+        label="DeepSeek R1 (OpenRouter)",
+        description="DeepSeek R1 reasoning model via OpenRouter.",
+        provider=ModelProvider.OPENROUTER,
+    ),
+    "openrouter-llama-3.70b": _preset(
+        config=OPENROUTER_LLAMA_3_70B,
+        label="Llama 3.1 70B (OpenRouter)",
+        description="Meta's Llama 3.1 70B Instruct via OpenRouter.",
+        provider=ModelProvider.OPENROUTER,
+    ),
+    "openrouter-llama-3.405b": _preset(
+        config=OPENROUTER_LLAMA_3_405B,
+        label="Llama 3.1 405B (OpenRouter)",
+        description="Meta's Llama 3.1 405B Instruct via OpenRouter.",
+        provider=ModelProvider.OPENROUTER,
+    ),
     "zai-glm4": _preset(
         config=ZAI_GLM4,
-        label="ZAI GLM-4",
-        description="Zhipu AI GLM-4 model.",
+        label="ZAI GLM-4 (Default)",
+        description="Zhipu AI GLM-4 model (alias for GLM-4 Plus).",
+        provider=ModelProvider.ZAI,
+    ),
+    "zai-glm4-plus": _preset(
+        config=ZAI_GLM4_PLUS,
+        label="ZAI GLM-4 Plus",
+        description="Zhipu AI's flagship GLM-4 Plus model.",
+        provider=ModelProvider.ZAI,
+    ),
+    "zai-glm4-air": _preset(
+        config=ZAI_GLM4_AIR,
+        label="ZAI GLM-4 Air",
+        description="Balanced GLM-4 Air model.",
+        provider=ModelProvider.ZAI,
+    ),
+    "zai-glm4-airx": _preset(
+        config=ZAI_GLM4_AIRX,
+        label="ZAI GLM-4 AirX",
+        description="Extreme speed GLM-4 AirX model.",
+        provider=ModelProvider.ZAI,
+    ),
+    "zai-glm4-flash": _preset(
+        config=ZAI_GLM4_FLASH,
+        label="ZAI GLM-4 Flash",
+        description="Fastest GLM-4 Flash model.",
+        provider=ModelProvider.ZAI,
+    ),
+    "zai-glm4-long": _preset(
+        config=ZAI_GLM4_LONG,
+        label="ZAI GLM-4 Long",
+        description="GLM-4 with extended context window.",
+        provider=ModelProvider.ZAI,
+    ),
+    "zai-glm4-0520": _preset(
+        config=ZAI_GLM4_0520,
+        label="ZAI GLM-4 (0520)",
+        description="Zhipu AI GLM-4 0520 snapshot.",
         provider=ModelProvider.ZAI,
     ),
     "grok-code-fast": _preset(

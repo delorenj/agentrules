@@ -370,10 +370,97 @@ OPENROUTER_AUTO = ModelConfig(
     tools_config={"enabled": False, "tools": None}
 )
 
-# ZAI configuration
-ZAI_GLM4 = ModelConfig(
-    provider=ModelProvider.ZAI,
-    model_name="glm-4",
+OPENROUTER_CLAUDE_3_5_SONNET = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="anthropic/claude-3.5-sonnet",
     reasoning=ReasoningMode.DISABLED,
     tools_config={"enabled": False, "tools": None}
 )
+
+OPENROUTER_CLAUDE_3_5_HAIKU = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="anthropic/claude-3.5-haiku",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_GEMINI_PRO_1_5 = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="google/gemini-pro-1.5",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_GEMINI_FLASH_1_5 = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="google/gemini-flash-1.5",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_DEEPSEEK_R1 = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="deepseek/deepseek-r1",
+    reasoning=ReasoningMode.ENABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_LLAMA_3_70B = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="meta-llama/llama-3.1-70b-instruct",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_LLAMA_3_405B = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="meta-llama/llama-3.1-405b-instruct",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+# ZAI (Zhipu AI) configuration
+ZAI_GLM4_PLUS = ModelConfig(
+    provider=ModelProvider.ZAI,
+    model_name="glm-4-plus",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+ZAI_GLM4_0520 = ModelConfig(
+    provider=ModelProvider.ZAI,
+    model_name="glm-4-0520",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+ZAI_GLM4_AIR = ModelConfig(
+    provider=ModelProvider.ZAI,
+    model_name="glm-4-air",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+ZAI_GLM4_AIRX = ModelConfig(
+    provider=ModelProvider.ZAI,
+    model_name="glm-4-airx",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+ZAI_GLM4_FLASH = ModelConfig(
+    provider=ModelProvider.ZAI,
+    model_name="glm-4-flash",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+ZAI_GLM4_LONG = ModelConfig(
+    provider=ModelProvider.ZAI,
+    model_name="glm-4-long",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+# Legacy/Default Alias
+ZAI_GLM4 = ZAI_GLM4_PLUS
