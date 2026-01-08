@@ -278,7 +278,43 @@ def recover_parse_xml_or_html(text: str):
     return etree.fromstring(text.encode("utf-8"), parser=parser)
 ```
 
-# 7. NEGATIVE PATTERNS
+# 7. DEVELOPMENT STANDARDS & LESSONS LEARNED
+
+## Version Management
+- **Workflow:**
+  1. Increment `version` in `pyproject.toml` (e.g., `3.1.2`).
+  2. Commit the change: `git commit -m "bump: v3.1.2"`.
+  3. Create a git tag: `git tag v3.1.2`.
+  4. Push commit and tags: `git push origin main --tags`.
+- **Rationale:** `uv tool upgrade` and other package managers rely on tagged releases or explicit version bumps to detect updates.
+
+## Adding New Providers
+To add a new AI provider (e.g., OpenRouter, ZAI), follow this strict checklist:
+1. **Constants:** Add the provider slug and environment variable to `src/agentrules/core/configuration/constants.py` (`PROVIDER_ENV_MAP`).
+2. **Enum:** Update `ModelProvider` in `src/agentrules/core/agents/base.py`.
+3. **Factory:** Register the new provider in `src/agentrules/core/agents/factory/factory.py`.
+4. **Models:** Define `ModelConfig` instances for the provider's models in `src/agentrules/core/types/models.py`.
+5. **Config:** Update `src/agentrules/config/agents.py`:
+   - Import new models.
+   - Update `_apply_model_limits` with context window and estimator logic.
+   - Add model presets to `MODEL_PRESETS`.
+6. **Presets:** Update `src/agentrules/core/configuration/model_presets.py` to include the provider's display name in `_provider_display_name`.
+7. **Implementation:** Create the package `src/agentrules/core/agents/<provider>/` with standard modules:
+   - `architect.py`, `client.py`, `config.py`, `prompting.py`, `request_builder.py`, `response_parser.py`, `tooling.py`.
+
+## Dynamic Model Listing & UI
+- **Pattern:** Model availability is filtered by `_provider_available` in `model_presets.py`.
+- **Constraint:** A provider's presets are ONLY visible if the API key is present in `config.toml` OR the environment variable (e.g., `OPENROUTER_API_KEY`) is set.
+- **UI:** The TUI (`src/agentrules/cli/ui/settings/models/`) groups models by provider.
+- **Fuzzy Search:** Use `run_fuzzy_search` from `utils.py` to bypass nested menus and filter the flattened list of all presets.
+
+## Tool Installation & Upgrades (`uv`)
+- **Dev Install:** `uv tool install --editable .` (changes reflect immediately).
+- **Force Reinstall:** `uv tool install --force .`
+- **Upgrade:** `uv tool upgrade agentrules` (requires version bump + tag).
+- **Check Version:** `agentrules --version`.
+
+# 8. NEGATIVE PATTERNS
 
 # What NOT to do:
 
