@@ -361,3 +361,19 @@ GPT5_2_HIGH = ModelConfig(
 O1_HIGH = O3_HIGH  # Deprecated alias
 # Some suites used "O3_MINI_HIGH" which corresponds to today's O4-mini high effort
 O3_MINI_HIGH = O4_MINI_HIGH  # Deprecated alias
+
+# OpenRouter configuration
+OPENROUTER_AUTO = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="openrouter/auto",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+# ZAI configuration
+ZAI_GLM4 = ModelConfig(
+    provider=ModelProvider.ZAI,
+    model_name="glm-4",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)

@@ -52,6 +52,8 @@ class ModelProvider(Enum):
     DEEPSEEK = "deepseek"
     GEMINI = "gemini"
     XAI = "xai"
+    OPENROUTER = "openrouter"
+    ZAI = "zai"
 
 # ====================================================
 # Get Logger

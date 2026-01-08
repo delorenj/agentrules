@@ -23,14 +23,18 @@ class EnvironmentManager:
         for provider, env_var in PROVIDER_ENV_MAP.items():
             if not env_var:
                 continue
+
+            # Respect existing environment variables (Env > Config)
+            if self.getenv(env_var):
+                continue
+
             cfg = config.providers.get(provider)
             api_key = cfg.api_key if cfg else None
-            if not api_key:
-                self._environ.pop(env_var, None)
-                continue
-            if provider == "gemini":
-                self._environ.pop("GEMINI_API_KEY", None)
-            self._environ[env_var] = api_key
+            
+            if api_key:
+                if provider == "gemini":
+                    self._environ.pop("GEMINI_API_KEY", None)
+                self._environ[env_var] = api_key
 
     def resolve_log_level(self, config: CLIConfig, default: int | None = None) -> int:
         env_value = self.getenv(VERBOSITY_ENV_VAR)

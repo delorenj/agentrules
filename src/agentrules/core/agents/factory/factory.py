@@ -57,6 +57,12 @@ class ArchitectFactory:
         elif provider == ModelProvider.GEMINI:
             from ..gemini import GeminiArchitect  # noqa: E402
             return GeminiArchitect(**common_args)
+        elif provider == ModelProvider.OPENROUTER:
+            from ..openrouter import OpenRouterArchitect  # noqa: E402
+            return OpenRouterArchitect(**common_args)
+        elif provider == ModelProvider.ZAI:
+            from ..zai import ZaiArchitect  # noqa: E402
+            return ZaiArchitect(**common_args)
         elif provider == ModelProvider.XAI:
             from ..xai import XaiArchitect  # noqa: E402
             return XaiArchitect(**common_args)

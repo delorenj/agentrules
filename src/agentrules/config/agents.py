@@ -48,6 +48,8 @@ from agentrules.core.types.models import (
     O3_MEDIUM,
     O4_MINI_HIGH,
     O4_MINI_LOW,
+    OPENROUTER_AUTO,
+    ZAI_GLM4,
     O4_MINI_MEDIUM,
     ModelConfig,
 )
@@ -98,6 +100,12 @@ def _apply_model_limits(config: ModelConfig) -> ModelConfig:
                 limit = 400_000
     elif provider == ModelProvider.DEEPSEEK:
         limit = limit or 64_000
+        estimator_family = estimator_family or "tiktoken"
+    elif provider == ModelProvider.OPENROUTER:
+        limit = limit or 128_000
+        estimator_family = estimator_family or "tiktoken"
+    elif provider == ModelProvider.ZAI:
+        limit = limit or 128_000
         estimator_family = estimator_family or "tiktoken"
     elif provider == ModelProvider.XAI:
         limit = limit or 256_000
@@ -351,6 +359,18 @@ MODEL_PRESETS: dict[str, PresetDefinition] = {
         label="Grok 4 Fast (Non-Reasoning)",
         description="Cost-efficient Grok tier without reasoning tokens.",
         provider=ModelProvider.XAI,
+    ),
+    "openrouter-auto": _preset(
+        config=OPENROUTER_AUTO,
+        label="OpenRouter Auto",
+        description="OpenRouter automatic model selection.",
+        provider=ModelProvider.OPENROUTER,
+    ),
+    "zai-glm4": _preset(
+        config=ZAI_GLM4,
+        label="ZAI GLM-4",
+        description="Zhipu AI GLM-4 model.",
+        provider=ModelProvider.ZAI,
     ),
     "grok-code-fast": _preset(
         config=GROK_CODE_FAST,

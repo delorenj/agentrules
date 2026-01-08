@@ -47,8 +47,8 @@ To get started with development, you'll need to set up your local environment.
 Clone the repository:
 
 ```bash
-git clone https://github.com/trevor-nichols/cursorrules-architect.git
-cd cursorrules-architect
+git clone https://github.com/delorenj/agentrules.git
+cd agentrules
 ```
 
 Create a virtual environment and activate it:
@@ -124,8 +124,8 @@ We welcome feature suggestions! Please open an issue with:
 2. **Clone Your Fork**:
 
    ```bash
-   git clone https://github.com/your-username/cursorrules-architect.git
-   cd cursorrules-architect
+   git clone https://github.com/your-username/agentrules.git
+   cd agentrules
    ```
 
 3. **Create a Feature Branch**:

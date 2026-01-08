@@ -26,6 +26,8 @@ PROVIDER_ENV_MAP = {
     "gemini": "GOOGLE_API_KEY",
     "xai": "XAI_API_KEY",
     "tavily": "TAVILY_API_KEY",
+    "openrouter": "OPENROUTER_API_KEY",
+    "zai": "ZAI_API_KEY",
 }
 
 TRUTHY_ENV_VALUES = {"1", "true", "yes", "on"}
