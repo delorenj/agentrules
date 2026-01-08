@@ -97,11 +97,23 @@ def get_available_presets_for_phase(
 
 def get_active_presets(overrides: Mapping[str, str] | None = None) -> dict[str, str]:
     overrides = overrides or CONFIG_MANAGER.get_model_overrides()
+    global_default = overrides.get("default")
+    
     active: dict[str, str] = {}
+    
+    # Include the global default setting itself so the UI knows about it
+    if global_default:
+        active["default"] = global_default
+
     for phase in PHASE_SEQUENCE:
         override = overrides.get(phase)
         if override is not None:
             active[phase] = override
+            continue
+        
+        # Fallback to global user default
+        if global_default:
+            active[phase] = global_default
             continue
 
         default_key = get_default_preset_key(phase)
@@ -116,23 +128,27 @@ def apply_user_overrides(overrides: Mapping[str, str] | None = None) -> dict[str
     Returns the applied preset mapping for further inspection.
     """
     overrides = overrides or CONFIG_MANAGER.get_model_overrides()
+    global_default = overrides.get("default")
+    
     applied: dict[str, str] = {}
 
     # reset to defaults first
     for phase, preset_key in agent_settings.MODEL_PRESET_DEFAULTS.items():
-        default_preset: PresetDefinition = agent_settings.MODEL_PRESETS[preset_key]
-        agent_settings.MODEL_CONFIG[phase] = default_preset["config"]
-        applied[phase] = preset_key
-
-    # apply overrides when valid
-    for phase, preset_key in overrides.items():
-        if phase not in agent_settings.MODEL_PRESET_DEFAULTS:
-            continue
-        override_preset: PresetDefinition | None = agent_settings.MODEL_PRESETS.get(preset_key)
-        if override_preset is None:
-            continue
-        agent_settings.MODEL_CONFIG[phase] = override_preset["config"]
-        applied[phase] = preset_key
+        # Determine effective key
+        effective_key = overrides.get(phase)
+        if effective_key is None:
+            effective_key = global_default or preset_key
+            
+        preset_def = agent_settings.MODEL_PRESETS.get(effective_key)
+        if preset_def:
+            agent_settings.MODEL_CONFIG[phase] = preset_def["config"]
+            applied[phase] = effective_key
+        else:
+            # Fallback if key is invalid (e.g. plugin removed)
+            default_def = agent_settings.MODEL_PRESETS.get(preset_key)
+            if default_def:
+                agent_settings.MODEL_CONFIG[phase] = default_def["config"]
+                applied[phase] = preset_key
 
     return applied
 

@@ -53,6 +53,29 @@ def configure_models(context: CliContext) -> None:
 
         phase = phase_selection
         title = model_presets.get_phase_title(phase)
+        
+        # Special handling for global default
+        if phase == "default":
+            presets = configuration.get_available_presets_for_phase("phase1", provider_keys) # Use phase1 available list as generic list
+            if not presets:
+                console.print("[yellow]No presets available; configure provider keys first.[/]")
+                continue
+            
+            # Use same flow as general phase but save to "default" key
+            try:
+                if _configure_general_phase(
+                    context,
+                    "default",
+                    "Global Default Model",
+                    presets,
+                    active.get("default"),
+                    None, # No default for the default override itself
+                ):
+                    updated = True
+            except _ConfigurationCancelled:
+                pass
+            continue
+
         presets = configuration.get_available_presets_for_phase(phase, provider_keys)
         if not presets:
             console.print(f"[yellow]No presets available for {title}; configure provider keys first.[/]")
@@ -105,6 +128,18 @@ def _build_phase_choices(
 ) -> list[questionary.Choice | questionary.Separator]:
     phase_choices: list[questionary.Choice | questionary.Separator] = []
     handled_phases: set[str] = set()
+    
+    # Add Global Default option
+    default_key = active.get("default")
+    default_model, default_provider = current_labels(default_key)
+    if default_model == "Not configured":
+        default_model = "System Defaults"
+        default_provider = ""
+        
+    phase_choices.append(
+        model_display_choice("⭐ Global Default", default_model, default_provider, value="default")
+    )
+    phase_choices.append(questionary.Separator())
 
     for phase in model_presets.PHASE_SEQUENCE:
         if phase in handled_phases:
