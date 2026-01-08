@@ -4,7 +4,7 @@ requires-python = ">=3.11.9"
 
 [[package]]
 name = "agentrules"
-version = "3.1.0"
+version = "3.1.7"
 source = { editable = "." }
 dependencies = [
     { name = "anthropic" },
