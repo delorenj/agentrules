@@ -13,7 +13,7 @@ from agentrules.cli.ui.styles import CLI_STYLE, model_display_choice, navigation
 from agentrules.core.configuration import model_presets
 
 from .researcher import configure_researcher_phase
-from .utils import build_model_choice_state, current_labels, select_variant
+from .utils import build_model_choice_state, current_labels, run_fuzzy_search, select_variant
 
 
 def configure_models(context: CliContext) -> None:
@@ -175,11 +175,14 @@ def _configure_general_phase(
         include_reset=True,
         reset_title=reset_title,
     )
+    
+    # Prepend Search option
+    state.choices.insert(0, questionary.Choice(title="🔍 Search...", value="__SEARCH__"))
 
     selection = questionary.select(
         f"{title}:",
         choices=state.choices,
-        default=state.default_value,
+        default=state.default_value if state.default_value != "__RESET__" else "__SEARCH__",
         qmark="🧠",
         style=CLI_STYLE,
     ).ask()
@@ -187,6 +190,12 @@ def _configure_general_phase(
     if selection is None:
         console.print("[yellow]Model configuration cancelled.[/]")
         raise _ConfigurationCancelled
+        
+    if selection == "__SEARCH__":
+        selection = run_fuzzy_search(presets, current_key)
+        if selection is None:
+            console.print("[yellow]Model configuration cancelled.[/]")
+            raise _ConfigurationCancelled
 
     if selection in state.group_selection_map:
         group_selection = state.group_selection_map[selection]

@@ -12,6 +12,7 @@ from agentrules.core.configuration import model_presets
 from .utils import (
     build_model_choice_state,
     current_labels,
+    run_fuzzy_search,
     select_variant,
 )
 
@@ -91,6 +92,11 @@ def configure_researcher_phase(
         reset_title="",
         initial_choices=initial_choices,
     )
+    
+    # Prepend Search option (after Keep but before Reset if handled by initial_choices logic, wait)
+    # initial_choices puts Keep/Reset first. Search should probably be prominent.
+    # Let's put it at the very top, before "Keep current" even.
+    state.choices.insert(0, questionary.Choice(title="🔍 Search...", value="__SEARCH__"))
 
     selection = questionary.select(
         "Researcher preset:",
@@ -103,6 +109,12 @@ def configure_researcher_phase(
     if selection is None:
         console.print("[yellow]Researcher configuration cancelled.[/]")
         return False
+        
+    if selection == "__SEARCH__":
+        selection = run_fuzzy_search(presets, current_key)
+        if selection is None:
+            console.print("[yellow]Researcher configuration cancelled.[/]")
+            return False
 
     if selection in state.group_selection_map:
         group_selection = state.group_selection_map[selection]

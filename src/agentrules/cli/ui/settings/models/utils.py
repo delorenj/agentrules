@@ -193,3 +193,47 @@ def select_variant(group_selection: GroupSelection) -> str | None:
         qmark="🧠",
         style=CLI_STYLE,
     ).ask()
+
+
+def run_fuzzy_search(
+    presets: Sequence[model_presets.PresetInfo],
+    current_key: str | None = None,
+) -> str | None:
+    """Run a fuzzy search prompt for model presets."""
+    
+    # Create display mapping
+    display_map: dict[str, str] = {}
+    choices: list[str] = []
+    
+    for preset in presets:
+        display = f"{preset.label} [{preset.provider_display}]"
+        if preset.key == current_key:
+            display += " [current]"
+        display_map[display] = preset.key
+        choices.append(display)
+
+    def fuzzy_matcher(text: str) -> list[str]:
+        if not text:
+            return choices
+        text_lower = text.lower()
+        # Subsequence match
+        matches = []
+        for choice in choices:
+            choice_lower = choice.lower()
+            it = iter(choice_lower)
+            if all(char in it for char in text_lower):
+                matches.append(choice)
+        return matches
+
+    selection = questionary.autocomplete(
+        "Search model (type to filter):",
+        choices=fuzzy_matcher,
+        qmark="🔍",
+        style=CLI_STYLE,
+        validate=lambda x: x in display_map or "Please select a valid model from the list.",
+    ).ask()
+    
+    if selection is None:
+        return None
+        
+    return display_map.get(selection)
