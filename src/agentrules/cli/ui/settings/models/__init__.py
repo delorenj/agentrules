@@ -13,7 +13,7 @@ from agentrules.cli.ui.styles import CLI_STYLE, model_display_choice, navigation
 from agentrules.core.configuration import model_presets
 
 from .researcher import configure_researcher_phase
-from .utils import fuzzy_select_model
+from .utils import current_labels, fuzzy_select_model
 
 
 def configure_models(context: CliContext) -> None:
