@@ -156,5 +156,7 @@ def _provider_display_name(provider: ModelProvider) -> str:
         ModelProvider.GEMINI: "Google Gemini",
         ModelProvider.DEEPSEEK: "DeepSeek",
         ModelProvider.XAI: "xAI Grok",
+        ModelProvider.OPENROUTER: "OpenRouter",
+        ModelProvider.ZAI: "Zhipu AI (GLM)",
     }
     return mapping.get(provider, provider.value.title())
