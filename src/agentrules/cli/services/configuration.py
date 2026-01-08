@@ -56,6 +56,11 @@ def save_phase_model(phase: str, preset_key: str | None) -> None:
     CONFIG_MANAGER.set_phase_model(phase, preset_key)
 
 
+def reset_all_phase_models() -> None:
+    CONFIG_MANAGER.reset_all_phase_models()
+    model_presets.apply_user_overrides()
+
+
 def get_researcher_mode() -> str:
     return CONFIG_MANAGER.get_researcher_mode()
 

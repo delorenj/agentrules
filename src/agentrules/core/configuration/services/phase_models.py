@@ -15,3 +15,7 @@ def set_phase_model(config: CLIConfig, phase: str, preset_key: str | None) -> No
 def get_model_overrides(config: CLIConfig) -> dict[str, str]:
     return dict(config.models)
 
+
+def reset_all_phase_models(config: CLIConfig) -> None:
+    config.models.clear()
+

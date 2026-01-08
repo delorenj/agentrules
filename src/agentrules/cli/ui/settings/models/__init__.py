@@ -54,6 +54,18 @@ def configure_models(context: CliContext) -> None:
         phase = phase_selection
         title = model_presets.get_phase_title(phase)
         
+        # Handle Reset all
+        if phase == "reset_all":
+            if questionary.confirm(
+                "Are you sure you want to reset all phase models to their default presets?",
+                default=False,
+                style=CLI_STYLE,
+            ).ask():
+                configuration.reset_all_phase_models()
+                console.print("[green]All phase models reset to defaults.[/]")
+                updated = True
+            continue
+
         # Special handling for global default
         if phase == "default":
             presets = configuration.get_available_presets_for_phase("phase1", provider_keys) # Use phase1 available list as generic list
@@ -184,6 +196,9 @@ def _build_phase_choices(
         model_label, provider_label = current_labels(current_key)
         phase_choices.append(model_display_choice(title, model_label, provider_label, value=phase))
         handled_phases.add(phase)
+
+    phase_choices.append(questionary.Separator())
+    phase_choices.append(navigation_choice("↺ Reset all to default", value="reset_all"))
 
     return phase_choices
 

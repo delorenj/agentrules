@@ -73,6 +73,12 @@ class ConfigManager:
         config = self._repository.load()
         return phase_models.get_model_overrides(config)
 
+    def reset_all_phase_models(self) -> CLIConfig:
+        config = self._repository.load()
+        phase_models.reset_all_phase_models(config)
+        self._repository.save(config)
+        return config
+
     # ------------------------------------------------------------------
     # Researcher feature toggles
     # ------------------------------------------------------------------
