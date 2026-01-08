@@ -433,6 +433,48 @@ OPENROUTER_KIMI_K2_THINKING = ModelConfig(
     tools_config={"enabled": False, "tools": None}
 )
 
+OPENROUTER_MINIMAX_M2 = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="minimax/minimax-m2",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_QWEN_3 = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="alibaba/qwen-3",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_GLM_4_7 = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="zhipu/glm-4-7",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_GLM_4_6V = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="zhipu/glm-4-6v",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_GLM_4_6 = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="zhipu/glm-4-6",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
+OPENROUTER_DEEPSEEK_CHAT_V2 = ModelConfig(
+    provider=ModelProvider.OPENROUTER,
+    model_name="deepseek/deepseek-chat-v2",
+    reasoning=ReasoningMode.DISABLED,
+    tools_config={"enabled": False, "tools": None}
+)
+
 # ZAI (Zhipu AI) configuration
 ZAI_GLM4_PLUS = ModelConfig(
     provider=ModelProvider.ZAI,
