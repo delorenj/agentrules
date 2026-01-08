@@ -212,7 +212,7 @@ def run_fuzzy_search(
         display_map[display] = preset.key
         choices.append(display)
 
-    def fuzzy_matcher(text: str) -> list[str]:
+    def fuzzy_matcher(text: str | None = None) -> list[str]:
         if not text:
             return choices
         text_lower = text.lower()
