@@ -160,62 +160,6 @@ class AnthropicArchitect(BaseArchitect):
 
         return _generator()
 
-    async def create_analysis_plan(self, phase1_results: dict, prompt: str | None = None) -> dict[str, Any]:
-        context: dict[str, Any] = {"phase1_results": phase1_results}
-        if prompt:
-            context["formatted_prompt"] = prompt
-        result = await self.analyze(context)
-        response: dict[str, Any] = {
-            "plan": result.get("findings", "No plan generated"),
-            "error": result.get("error"),
-        }
-        if result.get("tool_calls"):
-            response["tool_calls"] = result["tool_calls"]
-        return response
-
-    async def synthesize_findings(self, phase3_results: dict, prompt: str | None = None) -> dict[str, Any]:
-        context: dict[str, Any] = {"phase3_results": phase3_results}
-        if prompt:
-            context["formatted_prompt"] = prompt
-        result = await self.analyze(context)
-        response: dict[str, Any] = {
-            "analysis": result.get("findings", "No synthesis generated"),
-            "error": result.get("error"),
-        }
-        if result.get("tool_calls"):
-            response["tool_calls"] = result["tool_calls"]
-        return response
-
-    async def final_analysis(self, consolidated_report: dict, prompt: str | None = None) -> dict[str, Any]:
-        context: dict[str, Any] = {"consolidated_report": consolidated_report}
-        if prompt:
-            context["formatted_prompt"] = prompt
-        result = await self.analyze(context)
-        response: dict[str, Any] = {
-            "analysis": result.get("findings", "No final analysis generated"),
-            "error": result.get("error"),
-        }
-        if result.get("tool_calls"):
-            response["tool_calls"] = result["tool_calls"]
-        return response
-
-    async def consolidate_results(self, all_results: dict, prompt: str | None = None) -> dict[str, Any]:
-        content = prompt or (
-            "Consolidate these results into a comprehensive report:\n\n"
-            f"{json.dumps(all_results, indent=2)}"
-        )
-
-        result = await self.analyze({"formatted_prompt": content})
-        response: dict[str, Any] = {
-            "phase": "Consolidation",
-            "report": result.get("findings", "No report generated"),
-        }
-        if result.get("error"):
-            response["error"] = result["error"]
-        if result.get("tool_calls"):
-            response["tool_calls"] = result["tool_calls"]
-        return response
-
     # Internal helpers -----------------------------------------------------------
     def _prepare_request(
         self,

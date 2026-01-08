@@ -207,45 +207,6 @@ class DeepSeekArchitect(BaseArchitect):
 
         return _generator()
 
-    async def create_analysis_plan(self, phase1_results: dict, prompt: str | None = None) -> dict[str, Any]:
-        context: dict[str, Any] = {"phase1_results": phase1_results}
-        if prompt:
-            context["formatted_prompt"] = prompt
-        return await self._run_phase_request(context, result_key="plan", empty_value="No plan generated")
-
-    async def synthesize_findings(self, phase3_results: dict, prompt: str | None = None) -> dict[str, Any]:
-        context: dict[str, Any] = {"phase3_results": phase3_results}
-        if prompt:
-            context["formatted_prompt"] = prompt
-        return await self._run_phase_request(
-            context,
-            result_key="analysis",
-            empty_value="No synthesis generated",
-        )
-
-    async def final_analysis(self, consolidated_report: dict, prompt: str | None = None) -> dict[str, Any]:
-        context: dict[str, Any] = {"consolidated_report": consolidated_report}
-        if prompt:
-            context["formatted_prompt"] = prompt
-        return await self._run_phase_request(
-            context,
-            result_key="analysis",
-            empty_value="No final analysis generated",
-        )
-
-    async def consolidate_results(self, all_results: dict, prompt: str | None = None) -> dict[str, Any]:
-        context: dict[str, Any] = {"all_results": all_results}
-        if prompt:
-            context["formatted_prompt"] = prompt
-        response = await self._run_phase_request(
-            context,
-            result_key="report",
-            empty_value="No report generated",
-            include_phase=True,
-        )
-        response.setdefault("phase", "Consolidation")
-        return response
-
     # Client management ----------------------------------------------------------
     @property
     def client(self) -> Any:
@@ -298,29 +259,6 @@ class DeepSeekArchitect(BaseArchitect):
         if effective:
             detail += f" effective_limit={effective}"
         logger.info(f"[bold teal]Token preflight:[/bold teal] {detail}")
-
-    async def _run_phase_request(
-        self,
-        context: dict[str, Any],
-        *,
-        result_key: str,
-        empty_value: str,
-        include_phase: bool = False,
-    ) -> dict[str, Any]:
-        result = await self.analyze(context)
-        response: dict[str, Any] = {
-            result_key: result.get("findings") or empty_value,
-            "reasoning": result.get("reasoning"),
-        }
-
-        if include_phase:
-            response["phase"] = "Consolidation"
-
-        if result.get("tool_calls"):
-            response["tool_calls"] = result["tool_calls"]
-        if result.get("error"):
-            response["error"] = result["error"]
-        return response
 
     def _stream_dispatch(self, prepared: PreparedRequest) -> Iterator[StreamChunk]:
         client = self._client_override or get_client(self.base_url)

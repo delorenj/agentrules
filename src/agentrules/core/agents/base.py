@@ -12,12 +12,16 @@ This module serves as the foundation for all model interactions in the CursorRul
 # This section imports all the necessary libraries needed for the script.
 # ====================================================
 
+import json
 import logging
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
+from agentrules.config.prompts.final_analysis_prompt import format_final_analysis_prompt
+from agentrules.config.prompts.phase_2_prompts import format_phase2_prompt
+from agentrules.config.prompts.phase_4_prompts import format_phase4_prompt
 from agentrules.core.streaming import StreamChunk
 
 if TYPE_CHECKING:
@@ -131,7 +135,6 @@ class BaseArchitect(ABC):
         """
         pass
 
-    @abstractmethod
     async def create_analysis_plan(self, phase1_results: dict, prompt: str | None = None) -> dict:
         """
         Create an analysis plan based on Phase 1 results.
@@ -143,9 +146,18 @@ class BaseArchitect(ABC):
         Returns:
             Dictionary containing the analysis plan
         """
-        pass
+        prompt_content = prompt or format_phase2_prompt(phase1_results)
+        result = await self.analyze({"formatted_prompt": prompt_content})
+        
+        # Normalize result key to 'plan'
+        if "findings" in result and "plan" not in result:
+            result["plan"] = result.pop("findings")
+        elif "plan" not in result:
+             # Fallback if analyze returns something else or error
+             result.setdefault("plan", "No plan generated")
+             
+        return result
 
-    @abstractmethod
     async def synthesize_findings(self, phase3_results: dict, prompt: str | None = None) -> dict:
         """
         Synthesize findings from Phase 3.
@@ -157,9 +169,17 @@ class BaseArchitect(ABC):
         Returns:
             Dictionary containing the synthesis
         """
-        pass
+        prompt_content = prompt or format_phase4_prompt(phase3_results)
+        result = await self.analyze({"formatted_prompt": prompt_content})
+        
+        # Normalize to 'analysis'
+        if "findings" in result and "analysis" not in result:
+            result["analysis"] = result.pop("findings")
+        elif "analysis" not in result:
+            result.setdefault("analysis", "No synthesis generated")
+            
+        return result
 
-    @abstractmethod
     async def final_analysis(self, consolidated_report: dict, prompt: str | None = None) -> dict:
         """
         Perform final analysis on the consolidated report.
@@ -171,9 +191,17 @@ class BaseArchitect(ABC):
         Returns:
             Dictionary containing the final analysis
         """
-        pass
+        prompt_content = prompt or format_final_analysis_prompt(consolidated_report)
+        result = await self.analyze({"formatted_prompt": prompt_content})
+        
+        # Normalize to 'analysis'
+        if "findings" in result and "analysis" not in result:
+            result["analysis"] = result.pop("findings")
+        elif "analysis" not in result:
+            result.setdefault("analysis", "No final analysis generated")
+            
+        return result
 
-    @abstractmethod
     async def consolidate_results(self, all_results: dict, prompt: str | None = None) -> dict:
         """
         Consolidate results from all previous phases.
@@ -185,7 +213,21 @@ class BaseArchitect(ABC):
         Returns:
             Dictionary containing the consolidated report
         """
-        pass
+        default_prompt = (
+            "Consolidate these results into a comprehensive report:\n\n"
+            f"{json.dumps(all_results, indent=2)}"
+        )
+        prompt_content = prompt or default_prompt
+        result = await self.analyze({"formatted_prompt": prompt_content})
+        
+        # Normalize to 'report'
+        if "findings" in result and "report" not in result:
+            result["report"] = result.pop("findings")
+        elif "report" not in result:
+            result.setdefault("report", "No report generated")
+            
+        result.setdefault("phase", "Consolidation")
+        return result
 
     def stream_analyze(
         self,

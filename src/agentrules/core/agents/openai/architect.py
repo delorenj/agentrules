@@ -201,46 +201,6 @@ Format your response as a structured report with clear sections and findings."""
 
         return _generator()
 
-    async def create_analysis_plan(self, phase1_results: dict, prompt: str | None = None) -> dict:
-        """Create an analysis plan based on Phase 1 results."""
-        return await self._run_simple_request(
-            prompt or format_phase2_prompt(phase1_results),
-            result_key="plan",
-            empty_value="No plan generated",
-        )
-
-    async def synthesize_findings(self, phase3_results: dict, prompt: str | None = None) -> dict:
-        """Synthesize findings from Phase 3."""
-        return await self._run_simple_request(
-            prompt or format_phase4_prompt(phase3_results),
-            result_key="analysis",
-            empty_value="No synthesis generated",
-        )
-
-    async def final_analysis(self, consolidated_report: dict, prompt: str | None = None) -> dict:
-        """Perform final analysis on the consolidated report."""
-        return await self._run_simple_request(
-            prompt or format_final_analysis_prompt(consolidated_report),
-            result_key="analysis",
-            empty_value="No final analysis generated",
-        )
-
-    async def consolidate_results(self, all_results: dict, prompt: str | None = None) -> dict:
-        """Consolidate results from all previous phases."""
-        default_prompt = (
-            "Consolidate these results into a comprehensive report:\n\n"
-            f"{json.dumps(all_results, indent=2)}"
-        )
-
-        response = await self._run_simple_request(
-            prompt or default_prompt,
-            result_key="report",
-            empty_value="No report generated",
-            include_phase=True,
-        )
-        response.setdefault("phase", "Consolidation")
-        return response
-
     def _prepare_request(
         self,
         content: str,
@@ -267,35 +227,6 @@ Format your response as a structured report with clear sections and findings."""
         from agentrules.core.agent_tools.tool_manager import ToolManager
 
         return ToolManager.get_provider_tools(tool_list, ModelProvider.OPENAI)
-
-    async def _run_simple_request(
-        self,
-        content: str,
-        *,
-        result_key: str,
-        empty_value: str,
-        include_phase: bool = False,
-    ) -> dict:
-        try:
-            prepared = self._prepare_request(content)
-            self._log_token_estimate(prepared)
-            response = execute_request(prepared)
-            parsed = parse_response(response, prepared.api)
-
-            result: dict[str, Any] = {result_key: parsed.findings or empty_value}
-            if parsed.tool_calls:
-                result["tool_calls"] = parsed.tool_calls
-
-            if include_phase:
-                result["phase"] = "Consolidation"
-
-            return result
-        except Exception as exc:  # pragma: no cover - defensive logging
-            logger.error(f"Error during OpenAI request: {str(exc)}")
-            response: dict[str, Any] = {"error": str(exc)}
-            if include_phase:
-                response["phase"] = "Consolidation"
-            return response
 
     def _stream_dispatch(self, prepared: PreparedRequest) -> Iterator[StreamChunk]:
         if prepared.api == "responses":

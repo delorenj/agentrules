@@ -155,63 +155,6 @@ class GeminiArchitect(BaseArchitect):
 
         return result
 
-    async def create_analysis_plan(self, phase1_results: dict, prompt: str | None = None) -> dict[str, Any]:
-        context: dict[str, Any] = {"phase1_results": phase1_results}
-        if prompt:
-            context["formatted_prompt"] = prompt
-        result = await self.analyze(context)
-        return {
-            "plan": result.get("findings", "No plan generated"),
-            "error": result.get("error"),
-        }
-
-    async def synthesize_findings(self, phase3_results: dict, prompt: str | None = None) -> dict[str, Any]:
-        context: dict[str, Any] = {"phase3_results": phase3_results}
-        if prompt:
-            context["formatted_prompt"] = prompt
-        result = await self.analyze(context)
-        return {
-            "analysis": result.get("findings", "No synthesis generated"),
-            "error": result.get("error"),
-        }
-
-    async def final_analysis(self, consolidated_report: dict, prompt: str | None = None) -> dict[str, Any]:
-        context: dict[str, Any] = {"consolidated_report": consolidated_report}
-        if prompt:
-            context["formatted_prompt"] = prompt
-        result = await self.analyze(context)
-        return {
-            "analysis": result.get("findings", "No final analysis generated"),
-            "error": result.get("error"),
-        }
-
-    async def consolidate_results(self, all_results: dict, prompt: str | None = None) -> dict[str, Any]:
-        client = self.client
-        if client is None:
-            return {
-                "phase": "Consolidation",
-                "error": self._client_error_hint or "Gemini client not initialized.",
-            }
-
-        content = prompt or (
-            "Consolidate these results into a comprehensive report:\n\n"
-            f"{json.dumps(all_results, indent=2)}"
-        )
-
-        model_name = self._resolve_consolidation_model()
-        response = await generate_content_async(
-            client,
-            model=model_name,
-            contents=content,
-            config=None,
-        )
-
-        parsed = parse_generate_response(response)
-        return {
-            "phase": "Consolidation",
-            "report": parsed.findings or "No report generated",
-        }
-
     def stream_analyze(
         self,
         context: dict[str, Any],
