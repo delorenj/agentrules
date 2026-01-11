@@ -188,7 +188,7 @@ class _AgentProgress:
             task_id = self.progress.add_task(
                 "",
                 total=None,
-                icon=f"[{icon_color}]{icon}[/]",
+                state_icon=f"[{icon_color}]{icon}[/]",
                 name=name,
                 status=status,
             )
@@ -201,11 +201,9 @@ class _AgentProgress:
             self.progress.start_task(task_id)
         self.progress.update(
             task_id,
-            fields={
-                "state_icon": display_icon,
-                "name": name,
-                "status": status,
-            },
+            state_icon=display_icon,
+            name=name,
+            status=status,
         )
 
     def stop(self) -> None:

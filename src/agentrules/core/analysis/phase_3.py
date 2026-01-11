@@ -104,10 +104,21 @@ class Phase3Analysis:
 
                 # Assign all files to all fallback agents
                 all_file_paths = []
-                for line in tree:
-                    if ".py" in line or ".js" in line or ".ts" in line or ".jsx" in line or ".tsx" in line:
-                        path_match = line.strip().split(" ")[-1]  # Extract the file path
-                        all_file_paths.append(path_match)
+                # Fallback: scan directory for source files instead of parsing visual tree
+                skip_dirs = {".git", "node_modules", "__pycache__", "venv", ".venv", "dist", "build", "target", ".idea", ".vscode"}
+                valid_exts = {".py", ".js", ".ts", ".jsx", ".tsx", ".rs", ".toml", ".json", ".md", ".css", ".html"}
+
+                for root, dirs, files in os.walk(directory):
+                    # Filter directories in-place
+                    dirs[:] = [d for d in dirs if d not in skip_dirs]
+                    for file in files:
+                        if any(file.endswith(ext) for ext in valid_exts):
+                            full_path = Path(root) / file
+                            try:
+                                rel_path = full_path.relative_to(directory)
+                                all_file_paths.append(str(rel_path))
+                            except ValueError:
+                                continue
 
                 for agent in agent_definitions:
                     agent["file_assignments"] = all_file_paths

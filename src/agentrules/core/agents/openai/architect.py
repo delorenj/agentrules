@@ -161,7 +161,14 @@ Format your response as a structured report with clear sections and findings."""
             return results
         except Exception as exc:  # pragma: no cover - defensive logging
             agent_name = self.name or "OpenAI Architect"
-            logger.error(f"[bold red]Error in {agent_name}:[/bold red] {str(exc)}")
+            error_msg = str(exc)
+            if "User not found" in error_msg and "401" in error_msg:
+                error_msg += (
+                    "\n[bold yellow]Hint:[/bold yellow] 'User not found' (401) often indicates "
+                    "requests are hitting Zhipu AI (Moonshot) with an invalid key. "
+                    "Check if OPENAI_BASE_URL is set to a Zhipu endpoint unexpectedly."
+                )
+            logger.error(f"[bold red]Error in {agent_name}:[/bold red] {error_msg}")
             return {
                 "agent": agent_name,
                 "error": str(exc),

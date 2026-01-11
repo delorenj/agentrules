@@ -26,6 +26,11 @@ def get_client(base_url: str | None = None) -> OpenAI | Any:
     resolved_base = _normalise_base_url(base_url)
     if resolved_base not in _CLIENTS:
         api_key = os.environ.get("OPENROUTER_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "OPENROUTER_API_KEY is not set. Please configure it using 'agentrules configure' "
+                "or set the OPENROUTER_API_KEY environment variable."
+            )
         _CLIENTS[resolved_base] = OpenAI(api_key=api_key, base_url=resolved_base)
     return _CLIENTS[resolved_base]
 
